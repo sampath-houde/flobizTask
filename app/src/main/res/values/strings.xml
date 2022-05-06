@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FlobizTask</string>
+    <string name="news_poster">News Poster</string>
+    <string name="trending">Trending</string>
 </resources>
