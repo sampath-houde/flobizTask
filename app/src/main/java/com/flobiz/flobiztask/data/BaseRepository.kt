@@ -1,7 +1,7 @@
-package com.zocket.flobiztask.data
+package com.flobiz.flobiztask.data
 
 import android.util.Log
-import com.zocket.flobiztask.api.ApiResponseHandler
+import com.flobiz.flobiztask.api.ApiResponseHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException

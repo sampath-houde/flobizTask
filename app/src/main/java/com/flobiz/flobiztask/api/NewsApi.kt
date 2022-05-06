@@ -1,6 +1,6 @@
-package com.zocket.flobiztask.api
+package com.flobiz.flobiztask.api
 
-import com.zocket.flobiztask.data.NewsResponse
+import com.flobiz.flobiztask.data.NewsResponse
 import retrofit2.http.GET
 
 interface NewsApi {

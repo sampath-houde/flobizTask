@@ -1,7 +1,6 @@
-package com.task.newsapp.model
+package com.flobiz.flobiztask.data
 
-import com.zocket.flobiztask.data.BaseRepository
-import com.zocket.flobiztask.api.NewsApi
+import com.flobiz.flobiztask.api.NewsApi
 
 class NewsRepo(
     private val api: NewsApi

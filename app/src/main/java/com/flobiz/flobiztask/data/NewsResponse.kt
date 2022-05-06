@@ -1,4 +1,4 @@
-package com.zocket.flobiztask.data
+package com.flobiz.flobiztask.data
 
 data class NewsResponse(
     val articles: List<Article>,

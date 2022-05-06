@@ -1,4 +1,4 @@
-package com.zocket.flobiztask.api
+package com.flobiz.flobiztask.api
 
 import okhttp3.ResponseBody
 

@@ -1,6 +1,6 @@
-package com.zocket.flobiztask.api
+package com.flobiz.flobiztask.api
 
-import com.zocket.flobiztask.utils.Constants
+import com.flobiz.flobiztask.utils.Constants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
