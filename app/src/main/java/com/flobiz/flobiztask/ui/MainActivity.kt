@@ -7,12 +7,17 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.flobiz.flobiztask.api.ApiResponseHandler
 import com.flobiz.flobiztask.utils.Utils
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.zocket.flobiztask.databinding.ActivityMainBinding
+import com.zocket.flobiztask.databinding.ViewAdBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var viewModel: NewsViewModel? = null
+    private val adRequest by lazy { AdRequest.Builder().build() }
+    private val adapter by lazy { NewsAdapter(::loadAd) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                 is ApiResponseHandler.Success -> {
                     binding.banner.visibility = View.GONE
                     binding.recyclerView.visibility = View.VISIBLE
-                    val adapter = NewsAdapter(response.value.articles, this)
+                    adapter.setData(response.value.articles)
                     binding.recyclerView.adapter = adapter
                 }
 
@@ -57,5 +62,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun loadAd(adBinding: ViewAdBinding?){
+        adBinding?.adView?.loadAd(adRequest)
+    }
+
 
 }

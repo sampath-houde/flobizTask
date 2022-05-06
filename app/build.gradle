@@ -25,6 +25,7 @@ android {
 
     buildFeatures{
         viewBinding true
+        dataBinding true
     }
 
     compileOptions {
@@ -66,4 +67,7 @@ dependencies {
 
     //Logging Http Request
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
+
+    //GoogleAd
+    implementation 'com.google.android.gms:play-services-ads:20.6.0'
 }
