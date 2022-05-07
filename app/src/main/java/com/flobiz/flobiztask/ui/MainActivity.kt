@@ -9,18 +9,20 @@ import com.flobiz.flobiztask.utils.Utils
 import com.flobiz.flobiztask.utils.insertAdsToList
 import com.flobiz.flobiztask.utils.toastShort
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.zocket.flobiztask.databinding.ActivityMainBinding
 import com.zocket.flobiztask.databinding.ViewAdBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var binding: ActivityMainBinding
     private var viewModel: NewsViewModel? = null
-    private val adRequest = AdRequest.Builder().build()
+    private val adRequest by lazy { AdRequest.Builder().build() }
     private var adapter: NewsAdapter? = null
     private lateinit var job: Job
 
@@ -39,8 +41,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         //Initialize Job when activity is created
         job = Job()
 
+        launch(Dispatchers.Default) {
+            MobileAds.initialize(this@MainActivity)
+        }
+
         //Initialize Adapter
         adapter = NewsAdapter(::loadAd, job)
+        binding.recyclerView.setHasFixedSize(true)
 
         //Initialize Viewmodel
         viewModel = Utils.getMainViewModel(this)
@@ -90,7 +97,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
     }
 
     private fun loadAd(adBinding: ViewAdBinding?){
-        adBinding?.adView?.loadAd(adRequest)
+        launch(Dispatchers.Main + job) {
+            adBinding?.adView?.loadAd(adRequest)
+        }
     }
 
 }
