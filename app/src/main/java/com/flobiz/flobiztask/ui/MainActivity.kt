@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.flobiz.flobiztask.api.ApiResponseHandler
 import com.flobiz.flobiztask.data.Article
+import com.flobiz.flobiztask.utils.SharedPrefs
 import com.flobiz.flobiztask.utils.Utils
 import com.flobiz.flobiztask.utils.insertAdsToList
 import com.flobiz.flobiztask.utils.toastShort
@@ -41,9 +42,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         //Initialize Job when activity is created
         job = Job()
 
+
+
         launch(Dispatchers.Default) {
             MobileAds.initialize(this@MainActivity)
         }
+
+        SharedPrefs.init(this@MainActivity)
 
         //Initialize Adapter
         adapter = NewsAdapter(::loadAd, job)
@@ -52,23 +57,21 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         //Initialize Viewmodel
         viewModel = Utils.getMainViewModel(this)
 
-        callApi()
+        if(SharedPrefs.getList().isEmpty()) callApi()
+        else setValueToAdapter(SharedPrefs.getList())
 
-        //Make api call when refresh clicked
         binding.swipeRefresh.setOnRefreshListener {
             callApi()
         }
+
 
         //observing changes on newsList
         viewModel?.newsList?.observe(this) { response ->
             binding.progressBar2.visibility = View.GONE
             when (response) {
                 is ApiResponseHandler.Success -> {
-                    binding.banner.visibility = View.GONE
-                    binding.recyclerView.visibility = View.VISIBLE
                     val updatedList = (response.value.articles as MutableList<Article>).insertAdsToList()
-                    adapter?.setData(updatedList)
-                    binding.recyclerView.adapter = adapter
+                    setValueToAdapter(updatedList)
                 }
 
                 is ApiResponseHandler.Failure -> {
@@ -79,6 +82,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                 }
             }
         }
+    }
+
+    private fun setValueToAdapter(updatedList: MutableList<Article?>) {
+        binding.banner.visibility = View.GONE
+        binding.recyclerView.visibility = View.VISIBLE
+        adapter?.setData(updatedList)
+        binding.recyclerView.adapter = adapter
     }
 
     private fun callApi() {

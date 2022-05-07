@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.flobiz.flobiztask.data.Article
+import com.flobiz.flobiztask.utils.SharedPrefs
 import com.zocket.flobiztask.R
 import com.zocket.flobiztask.databinding.ViewAdBinding
 import com.zocket.flobiztask.databinding.ViewNewsBinding
@@ -97,6 +98,7 @@ class NewsAdapter(
 
     private fun removeItem(position: Int) {
         list.removeAt(position)
+        SharedPrefs.saveList(list)
         notifyDataSetChanged()
     }
 
