@@ -16,3 +16,4 @@ object Utils {
         return ViewModelProvider(context as MainActivity, factory).get(NewsViewModel::class.java)
     }
 }
+
