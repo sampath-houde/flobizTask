@@ -3,51 +3,64 @@ package com.flobiz.flobiztask.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
-import androidx.lifecycle.ViewModel
 import com.flobiz.flobiztask.api.ApiResponseHandler
+import com.flobiz.flobiztask.data.Article
 import com.flobiz.flobiztask.utils.Utils
+import com.flobiz.flobiztask.utils.insertAdsToList
+import com.flobiz.flobiztask.utils.toastShort
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
 import com.zocket.flobiztask.databinding.ActivityMainBinding
 import com.zocket.flobiztask.databinding.ViewAdBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
 
     private lateinit var binding: ActivityMainBinding
     private var viewModel: NewsViewModel? = null
-    private val adRequest by lazy { AdRequest.Builder().build() }
-    private val adapter by lazy { NewsAdapter(::loadAd) }
+    private val adRequest = AdRequest.Builder().build()
+    private var adapter: NewsAdapter? = null
+    private lateinit var job: Job
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        init()
+    }
 
+    private fun init() {
+
+        //Initialize Job when activity is created
+        job = Job()
+
+        //Initialize Adapter
+        adapter = NewsAdapter(::loadAd, job)
+
+        //Initialize Viewmodel
         viewModel = Utils.getMainViewModel(this)
+
         callApi()
 
+        //Make api call when refresh clicked
         binding.swipeRefresh.setOnRefreshListener {
             callApi()
         }
-    }
 
-
-    private fun callApi() {
-
-        binding.swipeRefresh.isRefreshing = false
-        binding.banner.visibility = View.GONE
-        binding.recyclerView.visibility = View.GONE
-
-        binding.progressBar2.visibility = View.VISIBLE
-        viewModel?.getNews()
+        //observing changes on newsList
         viewModel?.newsList?.observe(this) { response ->
             binding.progressBar2.visibility = View.GONE
             when (response) {
                 is ApiResponseHandler.Success -> {
                     binding.banner.visibility = View.GONE
                     binding.recyclerView.visibility = View.VISIBLE
-                    adapter.setData(response.value.articles)
+                    val updatedList = (response.value.articles as MutableList<Article>).insertAdsToList()
+                    adapter?.setData(updatedList)
                     binding.recyclerView.adapter = adapter
                 }
 
@@ -55,17 +68,29 @@ class MainActivity : AppCompatActivity() {
                     binding.recyclerView.visibility = View.GONE
                     binding.banner.visibility = View.VISIBLE
                     if (response.isNetworkError)
-                        Toast.makeText(applicationContext,
-                        "Connection Error",
-                        Toast.LENGTH_SHORT).show()
+                        toastShort("Connection Error")
                 }
             }
         }
     }
 
+    private fun callApi() {
+        binding.swipeRefresh.isRefreshing = false
+        binding.banner.visibility = View.GONE
+        binding.recyclerView.visibility = View.GONE
+
+        binding.progressBar2.visibility = View.VISIBLE
+        viewModel?.getNews()
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel()
+    }
+
     private fun loadAd(adBinding: ViewAdBinding?){
         adBinding?.adView?.loadAd(adRequest)
     }
-
 
 }
